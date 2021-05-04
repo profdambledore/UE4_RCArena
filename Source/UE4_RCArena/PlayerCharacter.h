@@ -48,8 +48,16 @@ protected:
 	void Crouch();
 	void Strafe();
 	// void MeleeAttack();
-	// void FireWeapon();
+	void FireWeapon();
+	void StopFiring();
 	// void CircleMenu();
+
+	bool CheckOwnedWeapon(int InID);
+	void EquipWeapon(int InID);
+	void UnequipWeapon();
+
+	void TakeDamage(int Amount);
+	void RestoreHealth();
 
 public:	
 	// Components
@@ -65,24 +73,48 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		UChildActorComponent* MeleeWeaponComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+		UChildActorComponent* WeaponChildComponent;
+
 	// Variables
+	// References
 	APlayerController* PC;
 	class APlayerHUD* HUDRef;
 	class AMeleeWeapon* MeleeWeapon;
+	class ABaseWeapon* CurrentWeapon;
 
+	// States
 	bool bInMenu = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		bool bInAir = false;
 
+	bool bIsCrouched = false;
+	bool bIsStrafe = false;
+	bool bHasMelee = false;
+
+	// Jumping
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		int CurrJumps = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 		int MaxJumps = 2;
 
-	bool bIsCrouched = false;
-	bool bIsStrafe = false;
-	bool bHasMelee = false;
+	// Weapons
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+		TArray<FPlayerWeaponInventory> WeaponInventory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+		TArray<int> CircleWheel;
+
+	// Health
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+		int CurrentHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+		int MaxHealth = 20;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+		int HealPerPickup = 20;
 
 };

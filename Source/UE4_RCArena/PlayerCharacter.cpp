@@ -4,6 +4,7 @@
 
 #include "PlayerHUD.h"
 #include "MeleeWeapon.h"
+#include "BaseWeapon.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -30,7 +31,6 @@ APlayerCharacter::APlayerCharacter()
 
 	// Setup Melee Weapon ChildActorComponent
 	MeleeWeaponComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("Melee Weapon"));
-	// Use ConstructorHelpers to find the PlayerWeaponClass
 	static ConstructorHelpers::FClassFinder<AActor> MeleeWeaponObject(TEXT("/Game/Weapon/Blueprint/BP_MeleeWeapon"));
 	if (MeleeWeaponObject.Succeeded())
 	{
@@ -38,6 +38,10 @@ APlayerCharacter::APlayerCharacter()
 	}
 	// Attach the MeleeWeapon to the MeleeHoldSocket
 	MeleeWeaponComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), FName("MeleeHoldSocket"));
+
+	// Setup Weapon ChildActorComponent
+	WeaponChildComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("Weapon Component"));
+	WeaponChildComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), FName("WeaponSocket"));
 
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -56,6 +60,12 @@ void APlayerCharacter::BeginPlay()
 
 	// Get reference to the player HUD
 	HUDRef = Cast<APlayerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+
+	// Set the players health to their max value
+	CurrentHealth = MaxHealth;
+
+	// Test
+	EquipWeapon(0);
 }
 
 // Called every frame
@@ -88,6 +98,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Strafe", IE_Released, this, &APlayerCharacter::Strafe);
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &APlayerCharacter::Crouch);
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &APlayerCharacter::Crouch);
+	PlayerInputComponent->BindAction("FireWeapon", IE_Pressed, this, &APlayerCharacter::FireWeapon);
+	PlayerInputComponent->BindAction("FireWeapon", IE_Released, this, &APlayerCharacter::StopFiring);
 }
 
 void APlayerCharacter::MoveX(float AxisValue)
@@ -164,4 +176,53 @@ void APlayerCharacter::Strafe()
 	{
 		bIsStrafe = true;
 	}
+}
+
+void APlayerCharacter::FireWeapon()
+{
+	// Check that there is a weapon equiped
+	if (CurrentWeapon != nullptr)
+	{
+		CurrentWeapon->FireWeapon();
+	}
+}
+
+void APlayerCharacter::StopFiring()
+{
+
+}
+
+bool APlayerCharacter::CheckOwnedWeapon(int InID)
+{
+	bool Out = false;
+	// Go through the array
+	for (int i = 0; i < WeaponInventory.Num(); i++)
+	{
+		// Check the InID to the Inventory
+		if (WeaponInventory[i].ID == InID)
+		{
+			// Check if the weapon trying to equip is owned
+			if (WeaponInventory[i].bOwned == true)
+			{
+				Out = true;
+				UE_LOG(LogTemp, Warning, TEXT("true"))
+			}
+		}
+	}
+	return Out;
+}
+
+void APlayerCharacter::EquipWeapon(int InID)
+{
+	if (CheckOwnedWeapon(InID) == true)
+	{
+		WeaponChildComponent->SetChildActorClass(WeaponInventory[InID].WeaponClass);
+		CurrentWeapon = Cast<ABaseWeapon>(WeaponChildComponent->GetChildActor());
+	}
+}
+
+void APlayerCharacter::UnequipWeapon()
+{
+	WeaponChildComponent->SetChildActorClass(nullptr);
+	CurrentWeapon = nullptr;
 }
