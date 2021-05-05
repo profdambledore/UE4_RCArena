@@ -9,6 +9,8 @@
 
 #include "StructEnumLibrary.generated.h"
 
+class ABaseBox;
+
 UCLASS()
 class UE4_RCARENA_API UStructEnumLibrary : public UBlueprintFunctionLibrary
 {
@@ -23,6 +25,14 @@ enum EWeaponVersion
 	Upgrade UMETA(Display Name = "Upgrade"),
 	Mega UMETA(Display Name = "Mega"),
 	Ultra UMETA(Display Name = "Ultra"),
+};
+
+UENUM()
+enum EBoxType
+{
+	Money UMETA(Display Name = "Money"),
+	Ammo UMETA(Display Name = "Ammo"),
+	Health UMETA(Display Name = "Health"),
 };
 
 USTRUCT(BlueprintType)
@@ -83,4 +93,17 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		bool bOwned;
+};
+
+USTRUCT(BlueprintType)
+struct FBoxTypes
+{
+	GENERATED_USTRUCT_BODY();
+
+public:
+	UPROPERTY(EditAnywhere)
+		TEnumAsByte<EBoxType> Type;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<ABaseBox> BoxClass;
 };

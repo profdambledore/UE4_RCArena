@@ -43,6 +43,10 @@ APlayerCharacter::APlayerCharacter()
 	WeaponChildComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("Weapon Component"));
 	WeaponChildComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), FName("WeaponSocket"));
 
+	// Setup the pickup range
+	PickupRange = CreateDefaultSubobject<USphereComponent>(TEXT("Pickup Range"));
+	PickupRange->SetSphereRadius(200.0);
+
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -65,7 +69,7 @@ void APlayerCharacter::BeginPlay()
 	CurrentHealth = MaxHealth;
 
 	// Test
-	EquipWeapon(0);
+	EquipWeapon(1);
 }
 
 // Called every frame
@@ -225,4 +229,27 @@ void APlayerCharacter::UnequipWeapon()
 {
 	WeaponChildComponent->SetChildActorClass(nullptr);
 	CurrentWeapon = nullptr;
+}
+
+void APlayerCharacter::TakeDamage(int Amount)
+{
+	// Check if the player has enough health
+	if ((CurrentHealth - Amount) <= 0)
+	{
+		KillPlayer();
+	}
+	else
+	{
+		CurrentHealth = CurrentHealth - Amount;
+	}
+}
+
+void APlayerCharacter::RestoreHealth(bool bFromPickup)
+{
+
+}
+
+void APlayerCharacter::KillPlayer()
+{
+	UE_LOG(LogTemp, Warning, TEXT("You have died"))
 }

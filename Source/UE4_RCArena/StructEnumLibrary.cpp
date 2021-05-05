@@ -3,3 +3,4 @@
 #include "StructEnumLibrary.h"
 
 #include "BaseWeapon.h"
+#include "BaseBox.h"

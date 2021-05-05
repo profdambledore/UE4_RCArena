@@ -10,6 +10,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/ChildActorComponent.h"
 #include "Components/ArrowComponent.h"
+#include "Components/SphereComponent.h"
 
 #include "StructEnumLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -52,12 +53,19 @@ protected:
 	void StopFiring();
 	// void CircleMenu();
 
+	// Weapon Functions
 	bool CheckOwnedWeapon(int InID);
 	void EquipWeapon(int InID);
 	void UnequipWeapon();
 
-	void TakeDamage(int Amount);
-	void RestoreHealth();
+	// Damage Functions
+	UFUNCTION(BlueprintCallable)
+		void TakeDamage(int Amount);
+
+	void RestoreHealth(bool bFromPickup);
+
+	UFUNCTION(BlueprintCallable)
+		void KillPlayer();
 
 public:	
 	// Components
@@ -75,6 +83,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		UChildActorComponent* WeaponChildComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+		USphereComponent* PickupRange;
 
 	// Variables
 	// References
@@ -100,6 +111,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 		int MaxJumps = 2;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		int TimesTouchedLava = 0;
+
 	// Weapons
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 		TArray<FPlayerWeaponInventory> WeaponInventory;
@@ -116,5 +130,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		int HealPerPickup = 20;
+
+	// Money
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Money")
+		int Money;
 
 };

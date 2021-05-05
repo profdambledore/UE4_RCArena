@@ -11,6 +11,7 @@ ABaseWeapon::ABaseWeapon()
 {
 	// Setup Components
 	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon Body"));
+	RootComponent = WeaponMesh;
 
 	AccuracyCone = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Accuracy Cone"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>ConeMeshObject(TEXT("/Game/Weapon/Mesh/Cone"));
@@ -19,8 +20,16 @@ ABaseWeapon::ABaseWeapon()
 		AccuracyCone->SetStaticMesh(ConeMeshObject.Object);
 	}
 
+	AccuracyCone->SetupAttachment(WeaponMesh);
+	AccuracyCone->SetRelativeLocation(FVector(0.0f, 0.0f, 90.0f));
+	AccuracyCone->SetRelativeRotation(FRotator(0.0f, 0.0f, 180.0f));
+
+	// Change Collision Settings
+	WeaponMesh->SetCollisionProfileName(TEXT("NoCollision"));
+	AccuracyCone->SetCollisionProfileName(TEXT("NoCollision"));
+
 	// Modify the AccuracyCone to the weapon stats
-	AccuracyCone->SetWorldScale3D(AccuracyConeScale);
+	//AccuracyCone->SetWorldScale3D(AccuracyConeScale);
 
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;

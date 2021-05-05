@@ -6,22 +6,25 @@
 // Sets default values
 ABaseBox::ABaseBox()
 {
+	// Setup Mesh
+	BoxMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Spawner Mesh"));
+
+	// Set this object to have physics
+	BoxMesh->SetSimulatePhysics(true);
+
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
 void ABaseBox::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void ABaseBox::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 

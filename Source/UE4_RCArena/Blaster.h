@@ -25,5 +25,5 @@ public:
 		{"Blaster", Base, 1, 30, 200, 20},
 	};
 
-	FVector AccuracyConeScale = FVector(1.0f, 1.0f, 1.0f);
+	FVector AccuracyConeScale = FVector(4.0f, 4.0f, 4.0f);
 };
