@@ -8,8 +8,13 @@
 #include "Components/StaticMeshComponent.h"
 
 #include "StructEnumLibrary.h"
+#include "Math/Vector.h"
 
 #include "BaseWeapon.generated.h"
+
+class ABaseBox;
+class ABaseEnemy;
+class ABaseProjectile;
 
 UCLASS()
 class UE4_RCARENA_API ABaseWeapon : public AActor
@@ -29,6 +34,13 @@ public:
 	UFUNCTION()
 		void SetWeaponStatsFromLevel(int InLevel);
 
+	// Overlap Functions
+	UFUNCTION()
+		void OnConeBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void OnConeEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -41,7 +53,21 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		UStaticMeshComponent* AccuracyCone;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		USceneComponent* BarrelPos;
+
 	// Variables
+	// References
+	class APlayerCharacter* OwningPlayer;
+	TSubclassOf<class ABaseProjectile> BulletToFire = nullptr;
+
+	// Targeting
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Targets")
+		TArray<AActor*> TargetsArray;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Targets")
+		AActor* ClosestTarget;
+
 	UPROPERTY()
 		FWeaponStats CurrentStats;
 
@@ -51,8 +77,5 @@ public:
 	UPROPERTY()
 		TArray<FWeaponStats> StatsAtEachLevel;
 
-	FVector AccuracyConeScale;
 	int ID;
-
-	class APlayerCharacter* OwningPlayer;
 };

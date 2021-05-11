@@ -23,6 +23,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void BreakBox();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -35,6 +37,4 @@ public:
 	// Variables
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Box Type")
 		TEnumAsByte<EBoxType> BoxType;
-
-
 };

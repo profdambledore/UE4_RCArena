@@ -69,7 +69,7 @@ void APlayerCharacter::BeginPlay()
 	CurrentHealth = MaxHealth;
 
 	// Test
-	EquipWeapon(1);
+	EquipWeapon(0);
 }
 
 // Called every frame

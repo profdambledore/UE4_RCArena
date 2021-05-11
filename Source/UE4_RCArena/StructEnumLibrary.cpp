@@ -4,3 +4,4 @@
 
 #include "BaseWeapon.h"
 #include "BaseBox.h"
+#include "BaseEnemy.h"

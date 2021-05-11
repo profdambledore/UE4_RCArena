@@ -11,6 +11,7 @@ ABaseBox::ABaseBox()
 
 	// Set this object to have physics
 	BoxMesh->SetSimulatePhysics(true);
+	BoxMesh->SetCollisionProfileName(TEXT("Box"));
 
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -26,5 +27,11 @@ void ABaseBox::BeginPlay()
 void ABaseBox::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void ABaseBox::BreakBox()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Box Broken"));
+	// Destroy the box
 }
 

@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "BaseWeapon.h"
-#include "Devastator.generated.h"
 
+#include "Devastator.generated.h"
 
 UCLASS()
 class UE4_RCARENA_API ADevastator : public ABaseWeapon
@@ -19,11 +19,5 @@ public:
 
 
 public:
-	// Variables
-	TArray<FWeaponStats> StatsAtEachLevel =
-	{
-		{"Devastator", Base, 1, 30, 200, 20},
-	};
 
-	FVector AccuracyConeScale = FVector(1.0f, 1.0f, 1.0f);
 };

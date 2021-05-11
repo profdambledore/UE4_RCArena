@@ -10,6 +10,7 @@
 #include "StructEnumLibrary.generated.h"
 
 class ABaseBox;
+class ABaseEnemy;
 
 UCLASS()
 class UE4_RCARENA_API UStructEnumLibrary : public UBlueprintFunctionLibrary
@@ -106,4 +107,62 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<ABaseBox> BoxClass;
+};
+
+// Round Control
+USTRUCT(BlueprintType)
+struct FAmountOfEnemy : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY();
+
+public:
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<ABaseEnemy> EnemyClass;
+
+	UPROPERTY(EditAnywhere)
+		int Amount;
+};
+
+USTRUCT(BlueprintType)
+struct FEnemyGroup : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY();
+
+public:
+	UPROPERTY(EditAnywhere)
+		TArray<FAmountOfEnemy> AmountOfEnemy;
+
+};
+
+USTRUCT(BlueprintType)
+struct FInduvidualRound : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY();
+
+public:
+	UPROPERTY(EditAnywhere)
+		TArray<FEnemyGroup> GroupOfEnemies;
+};
+
+
+USTRUCT(BlueprintType)
+struct FChallenge : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY();
+
+public:
+	UPROPERTY(EditAnywhere)
+		FString Name;
+
+	UPROPERTY(EditAnywhere)
+		int MoneyPayout;
+
+	UPROPERTY(EditAnywhere)
+		TArray<FInduvidualRound> InduvidualRound;
+
+	UPROPERTY(EditAnywhere)
+		bool bIsUnlocked;
+
+	UPROPERTY(EditAnywhere)
+		FString UnlockAfterCompleting;
 };

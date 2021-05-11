@@ -16,14 +16,4 @@ public:
 	ABlaster();
 
 	void FireWeapon();
-
-
-public:
-	// Variables
-	TArray<FWeaponStats> StatsAtEachLevel =
-	{
-		{"Blaster", Base, 1, 30, 200, 20},
-	};
-
-	FVector AccuracyConeScale = FVector(4.0f, 4.0f, 4.0f);
 };
