@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 
 #include "Engine/DataTable.h"
+#include "Engine/Texture2D.h"
 
 #include "StructEnumLibrary.generated.h"
 
@@ -87,6 +88,9 @@ public:
 		TSubclassOf<ABaseWeapon> WeaponClass;
 
 	UPROPERTY(EditAnywhere)
+		UTexture2D* Icon;
+
+	UPROPERTY(EditAnywhere)
 		int Level;
 
 	UPROPERTY(EditAnywhere)
@@ -107,6 +111,20 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<ABaseBox> BoxClass;
+};
+
+// Pickups
+USTRUCT(BlueprintType)
+struct FBoltTypes
+{
+	GENERATED_USTRUCT_BODY();
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		int Amount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		UStaticMesh* Mesh;
 };
 
 // Round Control

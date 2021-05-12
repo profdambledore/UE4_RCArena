@@ -18,6 +18,8 @@
 
 #include "PlayerCharacter.generated.h"
 
+class ABasePickup;
+
 UCLASS()
 class UE4_RCARENA_API APlayerCharacter : public ACharacter
 {
@@ -65,13 +67,23 @@ protected:
 	void RestoreHealth(bool bFromPickup);
 
 	UFUNCTION(BlueprintCallable)
+		void AddMoney(int InAmount);
+
+	UFUNCTION(BlueprintCallable)
 		void KillPlayer();
+
+	// Overlap Functions
+	UFUNCTION()
+		void OnPickupBeginOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void OnPickupEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void CollectPickup(AActor* InOtherActor);
 
 public:	
 	// Components
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		USkeletalMeshComponent* PlayerMesh;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		UCameraComponent* ThirdPersonCamera;
 
@@ -115,6 +127,8 @@ public:
 		int TimesTouchedLava = 0;
 
 	// Weapons
+	int CurrentWeaponID;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 		TArray<FPlayerWeaponInventory> WeaponInventory;
 

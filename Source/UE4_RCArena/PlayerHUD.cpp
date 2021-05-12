@@ -4,15 +4,41 @@
 
 #include "PlayerCharacter.h"
 #include "PlayerHUDWidget.h"
+//#include "RoundCtrl.h"
+
+class PlayerHUD;
 
 APlayerHUD::APlayerHUD()
 {
-
+	// Setup Widget Components
+	static ConstructorHelpers::FClassFinder<UPlayerHUDWidget>FoundPHWidget(TEXT("/Game/Player/Blueprint/WBP_PlayerHUD"));
+	if (FoundPHWidget.Succeeded())
+	{
+		PlayerHUDWidgetComponent = FoundPHWidget.Class;
+	}
 }
 
 void APlayerHUD::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Add the PlayerHUDWidget to the HUD
+	if (PlayerHUDWidgetComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HUD class was found"));
+		PlayerHUDWidget = CreateWidget<UPlayerHUDWidget>(GetWorld(), PlayerHUDWidgetComponent);
+
+		// Check that it was created
+		if (PlayerHUDWidget)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Added to viewport"));
+			// Add to viewport
+			PlayerHUDWidget->AddToViewport();
+			PlayerHUDWidget->PlayerRef = PlayerRef;
+			// Update all properties
+			PlayerHUDWidget->SynchronizeProperties();
+		}
+	}
 
 }
 
@@ -23,9 +49,27 @@ void APlayerHUD::SetPlayerRef(APlayerCharacter* InRef)
 }
 
 // Update all HUD Widgets
-void APlayerHUD::UpdateHUDElements()
+void APlayerHUD::UpdateHUDElements(TArray<FString> InArgs)
 {
-
+	for (int i = 0; i < InArgs.Num(); i++)
+	{
+		if (InArgs[i] == "Health")
+		{
+			PlayerHUDWidget->UpdateHealth();
+		}
+		else if (InArgs[i] =="Weapon")
+		{
+			PlayerHUDWidget->UpdateWeapon();
+		}
+		else if (InArgs[i] == "Money")
+		{
+			PlayerHUDWidget->UpdateMoney();
+		}
+		else if (InArgs[i] == "Rounds")
+		{
+			PlayerHUDWidget->UpdateRound();
+		}
+	}
 }
 
 void APlayerHUD::DrawHUD()

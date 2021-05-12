@@ -69,9 +69,9 @@ void ABaseProjectile::OnProjBeginOverlap(UPrimitiveComponent* OverlappedComp, AA
 			ProjectileMovement->HomingTargetComponent = nullptr;
 		}
 		// Cast to BaseBox, and call BreakBox()
-		ABaseBox* HitBox = Cast<ABaseBox>(OtherActor->GetClass());
-		HitBox->BreakBox();
+		FindCorrectTarget(OtherActor, true);
 		GetWorld()->DestroyActor(OtherActor, false, false); // Works.  For some reason, calling Destroy() in BaseBox->BreakBox() caused the program to crash - IsPendingKillPending, where 'this' was null.
+															// ERROR WAS FOUND - casting was always returning nullptr for some reason.  I dont know how to make it work
 	}
 	//else if (OtherActor.GetClass()->IsChildOf(ABaseEnemy::StaticClass() == true)
 	//{

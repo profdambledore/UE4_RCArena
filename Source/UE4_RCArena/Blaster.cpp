@@ -21,11 +21,10 @@ ABlaster::ABlaster()
 	}
 
 	// Find and set the projectile to fire
-	static ConstructorHelpers::FClassFinder<ABaseProjectile>ProjectileClass(TEXT("/Script/UE4_RCArena.BlasterProjectile"));
+	static ConstructorHelpers::FClassFinder<ABaseProjectile>ProjectileClass(TEXT("/Game/Weapon/Blueprint/BP_BlasterProjectile"));
 	if (ProjectileClass.Succeeded())
 	{
 		BulletToFire = ProjectileClass.Class;
-		UE_LOG(LogTemp, Warning, TEXT("Found Class"));
 	}
 
 	// Modify the AccuracyCone and BarrelPos

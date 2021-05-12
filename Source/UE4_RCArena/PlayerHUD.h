@@ -23,7 +23,7 @@ public:
 
 	// Update all HUD elements
 	UFUNCTION(BlueprintCallable)
-		void UpdateHUDElements();
+		void UpdateHUDElements(TArray<FString> InArgs);
 
 	// Set the reference to the player
 	UFUNCTION()
@@ -36,10 +36,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 		TSubclassOf<UUserWidget> PlayerHUDWidgetComponent;
 
+	// Widgets
+	class UPlayerHUDWidget* PlayerHUDWidget;
+
 private:
 	// Classes
 	class APlayerCharacter* PlayerRef = nullptr;
-
-	// Widgets
-	class UPlayerHUDWidget* PlayerHUDWidget;
+	//class ARoundCtrl* RoundRef = nullptr;
 };

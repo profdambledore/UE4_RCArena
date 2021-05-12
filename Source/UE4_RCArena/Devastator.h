@@ -16,8 +16,4 @@ public:
 	ADevastator();
 
 	void FireWeapon();
-
-
-public:
-
 };

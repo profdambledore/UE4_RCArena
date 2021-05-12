@@ -36,6 +36,10 @@ public:
 	UFUNCTION()
 		void OnProjEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void FindCorrectTarget(AActor* InOtherActor, bool bIsBox);
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

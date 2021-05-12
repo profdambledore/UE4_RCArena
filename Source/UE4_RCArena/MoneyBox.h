@@ -7,6 +7,8 @@
 
 #include "MoneyBox.generated.h"
 
+class ABasePickup;
+
 UCLASS()
 class UE4_RCARENA_API AMoneyBox : public ABaseBox
 {
@@ -15,5 +17,10 @@ class UE4_RCARENA_API AMoneyBox : public ABaseBox
 public:
 	AMoneyBox();
 
-	void BreakBox();
+	virtual void BreakBox() override;
+
+	int MaxSpawns = 12;
+	int MinSpawns = 4;
+
+	TSubclassOf<ABasePickup> PickupToSpawn = nullptr;
 };

@@ -10,7 +10,7 @@ ADevastator::ADevastator()
 
 	StatsAtEachLevel =
 	{
-		{"Devastator", Base, 1, 30, 200, 20},
+		{"Devastator", Base, 1, 30, 20, 20},
 	};
 
 	// Find and set the mesh
@@ -21,11 +21,11 @@ ADevastator::ADevastator()
 	}
 
 	// Find and set the projectile to fire
-	//static ConstructorHelpers::FClassFinder<ABaseProjectile>ProjectileClass(TEXT(""));
-	//if (WeaponMeshObject.Succeeded())
-	//{
-		//BulletToFire = ProjectileClass.Class;
-	//}
+	static ConstructorHelpers::FClassFinder<ABaseProjectile>ProjectileClass(TEXT("/Game/Weapon/Blueprint/BP_DevastatorProjectile"));
+	if (ProjectileClass.Succeeded())
+	{
+		BulletToFire = ProjectileClass.Class;
+	}
 
 	// Modify the AccuracyCone and BarrelPos
 	AccuracyCone->SetRelativeLocation(FVector(0.0f, -7.0f, 450.0f));

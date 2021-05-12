@@ -5,6 +5,7 @@
 #include "PlayerHUD.h"
 #include "MeleeWeapon.h"
 #include "BaseWeapon.h"
+#include "BasePickup.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -55,6 +56,9 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PickupRange->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnPickupBeginOverlap);
+	PickupRange->OnComponentEndOverlap.AddDynamic(this, &APlayerCharacter::OnPickupEndOverlap);
 	
 	// Get refernce to the player controller
 	PC = Cast<APlayerController>(GetController());
@@ -64,12 +68,13 @@ void APlayerCharacter::BeginPlay()
 
 	// Get reference to the player HUD
 	HUDRef = Cast<APlayerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	HUDRef->SetPlayerRef(this);
 
 	// Set the players health to their max value
 	CurrentHealth = MaxHealth;
 
 	// Test
-	EquipWeapon(0);
+	EquipWeapon(1);
 }
 
 // Called every frame
@@ -158,6 +163,21 @@ void APlayerCharacter::RotateCameraY(float AxisValue)
 	}
 }
 
+void APlayerCharacter::OnPickupBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// Check to see if the collided pickup is a money pickup
+	if (OtherActor->GetClass()->IsChildOf(ABasePickup::StaticClass()) == true)
+	{
+		CollectPickup(OtherActor);
+		GetWorld()->DestroyActor(OtherActor, false, false);
+	}
+}
+
+void APlayerCharacter::OnPickupEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+
+}
+
 void APlayerCharacter::Crouch()
 {
 	if (bIsCrouched == true)
@@ -222,6 +242,7 @@ void APlayerCharacter::EquipWeapon(int InID)
 	{
 		WeaponChildComponent->SetChildActorClass(WeaponInventory[InID].WeaponClass);
 		CurrentWeapon = Cast<ABaseWeapon>(WeaponChildComponent->GetChildActor());
+		CurrentWeaponID = InID;
 	}
 }
 
@@ -242,11 +263,19 @@ void APlayerCharacter::TakeDamage(int Amount)
 	{
 		CurrentHealth = CurrentHealth - Amount;
 	}
+	HUDRef->UpdateHUDElements({ "Health" });
 }
 
 void APlayerCharacter::RestoreHealth(bool bFromPickup)
 {
 
+}
+
+void APlayerCharacter::AddMoney(int InAmount)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Added Money"));
+	Money = Money + InAmount;
+	HUDRef->UpdateHUDElements({ "Money" });
 }
 
 void APlayerCharacter::KillPlayer()

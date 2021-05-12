@@ -6,6 +6,7 @@
 #include "BaseBox.h"
 #include "PlayerCharacter.h"
 #include "BaseProjectile.h"
+#include "PlayerHUD.h"
 
 // Sets default values
 ABaseWeapon::ABaseWeapon()
@@ -49,7 +50,10 @@ void ABaseWeapon::BeginPlay()
 
 	// Add Cone Collision Functions
 	AccuracyCone->OnComponentBeginOverlap.AddDynamic(this, &ABaseWeapon::OnConeBeginOverlap);
-	AccuracyCone->OnComponentEndOverlap.AddDynamic(this, &ABaseWeapon::OnConeEndOverlap);	
+	AccuracyCone->OnComponentEndOverlap.AddDynamic(this, &ABaseWeapon::OnConeEndOverlap);
+
+	// 
+	SetWeaponStatsFromLevel(OwningPlayer->WeaponInventory[ID].Level);
 }
 
 // Called every frame
@@ -128,7 +132,7 @@ void ABaseWeapon::OnConeEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* 
 void ABaseWeapon::FireWeapon()
 {
 	// Check that the player has ammo to fire this weapon
-	if ((OwningPlayer->WeaponInventory[ID].CurrentAmmo - 1) != 0)
+	if ((OwningPlayer->WeaponInventory[ID].CurrentAmmo) != 0)
 	{
 		// Remove one from the weapon invent
 		OwningPlayer->WeaponInventory[ID].CurrentAmmo--;
@@ -145,6 +149,9 @@ void ABaseWeapon::FireWeapon()
 			ABaseProjectile* NewBullet = GetWorld()->SpawnActor<ABaseProjectile>(BulletToFire, SpawnLoc, SpawnRot, ActorSpawnParams);
 			NewBullet->UpdateProjectileInfo(ClosestTarget);
 			UE_LOG(LogTemp, Warning, TEXT("Spawned Bullet"));
+			
+			// Update the HUD
+			OwningPlayer->HUDRef->UpdateHUDElements({ "Weapon" });
 		}
 	}
 
