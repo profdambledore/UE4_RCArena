@@ -57,6 +57,7 @@ void ABaseProjectile::UpdateProjectileInfo(AActor* TrackingTarget)
 
 void ABaseProjectile::OnProjBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Hit"));
 	// Check if the actor overlapped is either a child of BaseBox or BaseEnemy. 
 	if (OtherActor->GetClass()->IsChildOf(ABaseBox::StaticClass()) == true) 
 	{
@@ -78,7 +79,7 @@ void ABaseProjectile::OnProjBeginOverlap(UPrimitiveComponent* OverlappedComp, AA
 	//}
 
 	// Destroy the actor, whatever it hits
-	//Destroy();
+	Destroy();
 }
 
 void ABaseProjectile::OnProjEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
