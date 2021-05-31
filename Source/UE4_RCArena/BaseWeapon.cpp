@@ -7,6 +7,8 @@
 #include "PlayerCharacter.h"
 #include "BaseProjectile.h"
 #include "PlayerHUD.h"
+#include "WeaponTargetWidget.h"
+#include "BaseEnemy.h"
 
 // Sets default values
 ABaseWeapon::ABaseWeapon()
@@ -30,11 +32,22 @@ ABaseWeapon::ABaseWeapon()
 	AccuracyCone->SetCollisionProfileName(TEXT("Cone"));
 	AccuracyCone->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
 
-	//AccuracyCone->bHiddenInGame = true;
+	AccuracyCone->bHiddenInGame = true;
 
 	// Add the BarrelPos
 	BarrelPos = CreateDefaultSubobject<USceneComponent>(TEXT("Barrel Position"));
 	BarrelPos->SetupAttachment(WeaponMesh);
+
+	// Add TargetWidget
+	TargetWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Target Widget"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> FoundWidget(TEXT("/Game/Weapon/Blueprint/WBP_TargetWidget"));
+	if (FoundWidget.Succeeded())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Found"));
+		TargetWidget->SetWidgetClass(FoundWidget.Class);
+	}
+	TargetWidget->SetVisibility(false, false);
+	TargetWidget->SetDrawSize(FVector2D(100.0f, 100.0f));
 
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -98,10 +111,22 @@ void ABaseWeapon::Tick(float DeltaTime)
 			ClosestTarget = TargetsArray[Index];
 		}
 	}
-	// Else, make ClosestTarget to nullptr
+	// Else, make ClosestTarget to nullptr and hide the target widget
 	else if (TargetsArray.Num() == 0 && ClosestTarget != nullptr)
 	{
 		ClosestTarget = nullptr;
+		TargetWidget->SetVisibility(false, false);
+	}
+	// Set the position of the TargetWidget to the ClosestTarget.  If there isn't one, dont do anything
+	if (ClosestTarget != nullptr)
+	{
+		TargetWidget->SetVisibility(true, true);
+		TargetWidget->SetWorldLocation(ClosestTarget->GetActorLocation(), false);
+
+		// Rotate to match the players view
+		FVector PlayerLoc = GetWorld()->GetFirstPlayerController()->GetCharacter()->GetActorLocation();
+		FRotator NewRot = (PlayerLoc - TargetWidget->GetComponentLocation()).Rotation();
+		TargetWidget->SetWorldRotation(NewRot);
 	}
 }
 
@@ -109,6 +134,11 @@ void ABaseWeapon::OnConeBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor
 {
 	// Check if the actor overlapped is either a child of BaseBox or BaseEnemy.  Else, don't add it to the array
 	if (OtherActor->GetClass()->IsChildOf(ABaseBox::StaticClass()) == true) // || OtherActor.GetClass() == ABaseEnemy::StaticClass()
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Added to Array"));
+		TargetsArray.Add(OtherActor);
+	}
+	else if (OtherActor->GetClass()->IsChildOf(ABaseEnemy::StaticClass()) == true) // || OtherActor.GetClass() == ABaseEnemy::StaticClass()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Added to Array"));
 		TargetsArray.Add(OtherActor);
@@ -147,7 +177,7 @@ void ABaseWeapon::FireWeapon()
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
 			ABaseProjectile* NewBullet = GetWorld()->SpawnActor<ABaseProjectile>(BulletToFire, SpawnLoc, SpawnRot, ActorSpawnParams);
-			NewBullet->UpdateProjectileInfo(ClosestTarget);
+			NewBullet->UpdateProjectileInfo(ClosestTarget, CurrentStats.Damage);
 			UE_LOG(LogTemp, Warning, TEXT("Spawned Bullet"));
 			
 			// Update the HUD

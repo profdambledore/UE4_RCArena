@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 
 #include "Components/StaticMeshComponent.h"
+#include "Components/WidgetComponent.h"
 
 #include "StructEnumLibrary.h"
 #include "Math/Vector.h"
@@ -15,6 +16,7 @@
 class ABaseBox;
 class ABaseEnemy;
 class ABaseProjectile;
+class UWeaponTargetWidget;
 
 UCLASS()
 class UE4_RCARENA_API ABaseWeapon : public AActor
@@ -55,6 +57,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		USceneComponent* BarrelPos;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+		UWidgetComponent* TargetWidget;
 
 	// Variables
 	// References

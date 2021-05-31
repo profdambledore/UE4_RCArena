@@ -30,16 +30,6 @@ APlayerCharacter::APlayerCharacter()
 	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Third Person Camera"));
 	ThirdPersonCamera->SetupAttachment(ThirdPersonSpringArm, USpringArmComponent::SocketName);
 
-	// Setup Melee Weapon ChildActorComponent
-	MeleeWeaponComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("Melee Weapon"));
-	static ConstructorHelpers::FClassFinder<AActor> MeleeWeaponObject(TEXT("/Game/Weapon/Blueprint/BP_MeleeWeapon"));
-	if (MeleeWeaponObject.Succeeded())
-	{
-		MeleeWeaponComponent ->SetChildActorClass(MeleeWeaponObject.Class);
-	}
-	// Attach the MeleeWeapon to the MeleeHoldSocket
-	MeleeWeaponComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), FName("MeleeHoldSocket"));
-
 	// Setup Weapon ChildActorComponent
 	WeaponChildComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("Weapon Component"));
 	WeaponChildComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, false), FName("WeaponSocket"));
@@ -63,9 +53,6 @@ void APlayerCharacter::BeginPlay()
 	// Get refernce to the player controller
 	PC = Cast<APlayerController>(GetController());
 
-	// Set the reference to the PlayerWeapon class in the ChildActorComponent
-	MeleeWeapon = Cast<AMeleeWeapon>(MeleeWeaponComponent->GetChildActor());
-
 	// Get reference to the player HUD
 	HUDRef = Cast<APlayerHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	HUDRef->SetPlayerRef(this);
@@ -73,8 +60,14 @@ void APlayerCharacter::BeginPlay()
 	// Set the players health to their max value
 	CurrentHealth = MaxHealth;
 
+	// Show the challenge select menu
+	PC->bShowMouseCursor = true; 
+	PC->bEnableClickEvents = true;
+	PC->bEnableMouseOverEvents = true;
+	//ToggleMenu();
+
 	// Test
-	EquipWeapon(1);
+	EquipWeapon(WeaponInventory[0].ID);
 }
 
 // Called every frame
@@ -109,6 +102,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &APlayerCharacter::Crouch);
 	PlayerInputComponent->BindAction("FireWeapon", IE_Pressed, this, &APlayerCharacter::FireWeapon);
 	PlayerInputComponent->BindAction("FireWeapon", IE_Released, this, &APlayerCharacter::StopFiring);
+	PlayerInputComponent->BindAction("NextWeapon", IE_Pressed, this, &APlayerCharacter::NextWeapon);
+	PlayerInputComponent->BindAction("PreviousWeapon", IE_Pressed, this, &APlayerCharacter::PrevWeapon);
 }
 
 void APlayerCharacter::MoveX(float AxisValue)
@@ -204,16 +199,97 @@ void APlayerCharacter::Strafe()
 
 void APlayerCharacter::FireWeapon()
 {
-	// Check that there is a weapon equiped
-	if (CurrentWeapon != nullptr)
+	if (bInMenu == false)
 	{
-		CurrentWeapon->FireWeapon();
+		// Check that there is a weapon equiped
+		if (CurrentWeapon != nullptr)
+		{
+			CurrentWeapon->FireWeapon();
+		}
 	}
 }
 
 void APlayerCharacter::StopFiring()
 {
 
+}
+
+void APlayerCharacter::NextWeapon()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Next"));
+	// Move one weapon up in the CicleMenu array
+	// Find the weapons position in the array
+	bool bFoundWeapon = false;
+	for (int i = 0; i < CircleWheel.Num(); i++)
+	{
+		if (bFoundWeapon == false)
+		{
+			if (CurrentWeapon->ID == CircleWheel[i])
+			{
+				bFoundWeapon = true;
+				// Check if it is at the end of the array
+				if (i != (CircleWheel.Num() - 1))
+				{
+					// Get the weapon at the first position in the array
+					EquipWeapon(CircleWheel[(i + 1)]);
+				}
+				else
+				{
+					// Get the weapon at the next array index
+					EquipWeapon(CircleWheel[0]);
+				}
+			}
+		}
+	}
+}
+
+void APlayerCharacter::PrevWeapon()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Prev"));
+	// Move one weapon down in the CicleMenu array
+	// Find the weapons position in the array
+	bool bFoundWeapon = false;
+	for (int i = 0; i < CircleWheel.Num(); i++)
+	{
+		if (bFoundWeapon == false)
+		{
+			if (CurrentWeapon->ID == CircleWheel[i])
+			{
+				bFoundWeapon = true;
+				// Check if it is at the start of the array
+				if (i == 0)
+				{
+					// Get the weapon at the first position in the array
+					EquipWeapon(CircleWheel[(CircleWheel.Num() - 1)]);
+				}
+				else
+				{
+					// Get the weapon at the previous array index
+					EquipWeapon(CircleWheel[(i - 1)]);
+				}
+			}
+		}
+	}
+}
+
+void APlayerCharacter::ToggleMenu()
+{
+	if (bInMenu == true)
+	{
+		PC->bShowMouseCursor = false;
+		PC->bEnableClickEvents = false;
+		PC->bEnableMouseOverEvents = false;
+		bInMenu = false;
+		HUDRef->ShowChallengeMenu(false);
+	}
+	else
+	{
+		PC->bShowMouseCursor = true; 
+		PC->bEnableClickEvents = true; 
+		PC->bEnableMouseOverEvents = true;
+		bInMenu = true;
+		HUDRef->ShowChallengeMenu(true);
+	}
 }
 
 bool APlayerCharacter::CheckOwnedWeapon(int InID)
@@ -229,7 +305,6 @@ bool APlayerCharacter::CheckOwnedWeapon(int InID)
 			if (WeaponInventory[i].bOwned == true)
 			{
 				Out = true;
-				UE_LOG(LogTemp, Warning, TEXT("true"))
 			}
 		}
 	}
@@ -243,6 +318,10 @@ void APlayerCharacter::EquipWeapon(int InID)
 		WeaponChildComponent->SetChildActorClass(WeaponInventory[InID].WeaponClass);
 		CurrentWeapon = Cast<ABaseWeapon>(WeaponChildComponent->GetChildActor());
 		CurrentWeaponID = InID;
+		if (HUDRef->PlayerHUDWidget != nullptr)
+		{
+			HUDRef->UpdateHUDElements({ "Weapon" });
+		}
 	}
 }
 
@@ -266,9 +345,16 @@ void APlayerCharacter::TakeDamage(int Amount)
 	HUDRef->UpdateHUDElements({ "Health" });
 }
 
-void APlayerCharacter::RestoreHealth(bool bFromPickup)
+void APlayerCharacter::RestoreHealth()
 {
-
+	int NewHealth = CurrentHealth;
+	NewHealth += (MaxHealth / 5);
+	if (NewHealth > MaxHealth)
+	{
+		NewHealth = MaxHealth;
+	}
+	CurrentHealth = NewHealth;
+	HUDRef->UpdateHUDElements({ "Health" });
 }
 
 void APlayerCharacter::AddMoney(int InAmount)
@@ -276,6 +362,36 @@ void APlayerCharacter::AddMoney(int InAmount)
 	UE_LOG(LogTemp, Warning, TEXT("Added Money"));
 	Money = Money + InAmount;
 	HUDRef->UpdateHUDElements({ "Money" });
+}
+
+void APlayerCharacter::AddAmmo()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Added Ammo"));
+	// Get a list of all weapons less than max ammo
+	TArray<int> WeaponsCanAddAmmo;
+	for (int i = 0; i < WeaponInventory.Num(); i++)
+	{
+		if (WeaponInventory[i].CurrentAmmo != WeaponInventory[i].MaxAmmo)
+		{
+			WeaponsCanAddAmmo.Add(i);
+		}
+	}
+
+	if (WeaponsCanAddAmmo.Num() > 0)
+	{
+		// Choose a random weapon that can add ammo
+		int IndexToAddAt = FMath::RandRange(0, WeaponsCanAddAmmo.Num() - 1);
+
+		// Add to the selected index if one can add ammo
+		int NewAmmo = WeaponInventory[WeaponsCanAddAmmo[IndexToAddAt]].CurrentAmmo;
+		NewAmmo += WeaponInventory[WeaponsCanAddAmmo[IndexToAddAt]].AmmoPerPickup;
+		if (NewAmmo > WeaponInventory[WeaponsCanAddAmmo[IndexToAddAt]].MaxAmmo)
+		{
+			NewAmmo = WeaponInventory[WeaponsCanAddAmmo[IndexToAddAt]].MaxAmmo;
+		}
+		WeaponInventory[WeaponsCanAddAmmo[IndexToAddAt]].CurrentAmmo = NewAmmo;
+	}
+	HUDRef->UpdateHUDElements({ "Weapon" });
 }
 
 void APlayerCharacter::KillPlayer()

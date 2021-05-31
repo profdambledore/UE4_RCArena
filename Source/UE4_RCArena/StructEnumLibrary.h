@@ -97,6 +97,12 @@ public:
 		int CurrentAmmo;
 
 	UPROPERTY(EditAnywhere)
+		int MaxAmmo;
+
+	UPROPERTY(EditAnywhere)
+		int AmmoPerPickup;
+
+	UPROPERTY(EditAnywhere)
 		bool bOwned;
 };
 
@@ -134,10 +140,23 @@ struct FAmountOfEnemy : public FTableRowBase
 	GENERATED_USTRUCT_BODY();
 
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		TSubclassOf<ABaseEnemy> EnemyClass;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		int Amount;
+};
+
+USTRUCT(BlueprintType)
+struct FAmountOfBox : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY();
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		TEnumAsByte<EBoxType> Type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		int Amount;
 };
 
@@ -147,7 +166,7 @@ struct FEnemyGroup : public FTableRowBase
 	GENERATED_USTRUCT_BODY();
 
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		TArray<FAmountOfEnemy> AmountOfEnemy;
 
 };
@@ -158,8 +177,11 @@ struct FInduvidualRound : public FTableRowBase
 	GENERATED_USTRUCT_BODY();
 
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		TArray<FEnemyGroup> GroupOfEnemies;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		TArray<FAmountOfBox> BoxSpawns;
 };
 
 
@@ -169,18 +191,18 @@ struct FChallenge : public FTableRowBase
 	GENERATED_USTRUCT_BODY();
 
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		FString Name;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		int MoneyPayout;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		TArray<FInduvidualRound> InduvidualRound;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		bool bIsUnlocked;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		FString UnlockAfterCompleting;
 };

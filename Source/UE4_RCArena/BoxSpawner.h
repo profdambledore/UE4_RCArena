@@ -29,7 +29,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void SpawnBox(TEnumAsByte<EBoxType> BoxToSpawn);
+	UFUNCTION(BlueprintCallable)
+		void SpawnBox(TEnumAsByte<EBoxType> BoxToSpawn);
+
 	void SpawnBoxRandom();
 
 public:	

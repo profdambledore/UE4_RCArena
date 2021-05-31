@@ -72,5 +72,5 @@ public:
 
 	// References
 	APlayerCharacter* PlayerRef = nullptr;
-	//class ARoundCtrl* RoundCtrlRef = nullptr;
+	class ARoundCrtl* RoundCtrlRef = nullptr;
 };

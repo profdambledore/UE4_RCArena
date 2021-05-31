@@ -4,7 +4,7 @@
 
 #include "PlayerCharacter.h"
 #include "BaseWeapon.h"
-//#include "RoundCtrl.h"
+#include "RoundCrtl.h"
 
 void UPlayerHUDWidget::SynchronizeProperties()
 {
@@ -18,7 +18,6 @@ void UPlayerHUDWidget::SynchronizeProperties()
 			UpdateHealth();
 			UpdateWeapon();
 			UpdateMoney();
-			UpdateRound();
 		}
 	}
 }
@@ -54,5 +53,10 @@ void UPlayerHUDWidget::UpdateMoney()
 
 void UPlayerHUDWidget::UpdateRound()
 {
+	// Update the CurrentRoundText
+	TArray< FStringFormatArg > Arguments;
+	Arguments.Add(FStringFormatArg(RoundCtrlRef->CurrentRound + 1));
+	Arguments.Add(FStringFormatArg(RoundCtrlRef->CurrentChallenge.InduvidualRound.Num()));
 
+	CurrentRound->SetText(FText::FromString(FString::Format(TEXT("{0} / {1}"), Arguments)));
 }

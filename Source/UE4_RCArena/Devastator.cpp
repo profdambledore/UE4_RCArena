@@ -10,7 +10,7 @@ ADevastator::ADevastator()
 
 	StatsAtEachLevel =
 	{
-		{"Devastator", Base, 1, 30, 20, 20},
+		{"Devastator", Base, 1, 30, 20, 5},
 	};
 
 	// Find and set the mesh

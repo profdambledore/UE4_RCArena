@@ -26,6 +26,17 @@ ABoxSpawner::ABoxSpawner()
 		BoxTypesArray[0].BoxClass = MoneyBoxClass.Class;
 	}
 
+	static ConstructorHelpers::FClassFinder<ABaseBox>AmmoBoxClass(TEXT("/Script/UE4_RCArena.AmmoBox"));
+	if (AmmoBoxClass.Succeeded())
+	{
+		BoxTypesArray[1].BoxClass = AmmoBoxClass.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<ABaseBox>HealthBoxClass(TEXT("/Script/UE4_RCArena.HealthBox"));
+	if (HealthBoxClass.Succeeded())
+	{
+		BoxTypesArray[2].BoxClass = HealthBoxClass.Class;
+	}
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -34,8 +45,6 @@ ABoxSpawner::ABoxSpawner()
 void ABoxSpawner::BeginPlay()
 {
 	Super::BeginPlay();
-
-	SpawnBox(TestBoxSpawn);
 }
 
 void ABoxSpawner::SpawnBox(TEnumAsByte<EBoxType> BoxToSpawn)

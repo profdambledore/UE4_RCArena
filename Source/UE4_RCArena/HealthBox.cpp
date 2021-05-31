@@ -1,25 +1,26 @@
+// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "MoneyBox.h"
+#include "HealthBox.h"
 #include "BasePickup.h"
 
-AMoneyBox::AMoneyBox()
+AHealthBox::AHealthBox()
 {
 	// Set the mesh of the box
-	static ConstructorHelpers::FObjectFinder<UStaticMesh>BoxMeshObject(TEXT("/Game/Box/Mesh/SM_MoneyBox"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>BoxMeshObject(TEXT("/Game/Box/Mesh/SM_HealthBox"));
 	if (BoxMeshObject.Succeeded())
 	{
 		BoxMesh->SetStaticMesh(BoxMeshObject.Object);
 	}
 
 	// Find the money class and store it for later
-	static ConstructorHelpers::FClassFinder<ABasePickup>PickupClass(TEXT("/Game/Pickup/Blueprint/BP_MoneyPickup"));
+	static ConstructorHelpers::FClassFinder<ABasePickup>PickupClass(TEXT("/Game/Pickup/Blueprint/BP_HealthPickup"));
 	if (PickupClass.Succeeded())
 	{
 		PickupToSpawn = PickupClass.Class;
 	}
 }
 
-void AMoneyBox::BreakBox()
+void AHealthBox::BreakBox()
 {
 	FActorSpawnParameters ActorSpawnParams;
 	ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -30,7 +31,7 @@ void AMoneyBox::BreakBox()
 	{
 		// Get a random vector in range
 		const FRotator SpawnRot = BoxMesh->GetComponentRotation();
-		
+
 		FVector BML = BoxMesh->GetComponentLocation();
 		float SLX = FMath::RandRange(BML.X - 50, BML.X + 50);
 		float SLY = FMath::RandRange(BML.Y - 50, BML.Y + 50);

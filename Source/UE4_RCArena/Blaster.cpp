@@ -10,7 +10,7 @@ ABlaster::ABlaster()
 
 	StatsAtEachLevel =
 	{
-		{"Blaster", Base, 1, 30, 200, 20},
+		{"Blaster", Base, 1, 4, 200, 20},
 	};
 
 	// Set the mesh

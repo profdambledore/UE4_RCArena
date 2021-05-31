@@ -35,6 +35,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable)
+		void ToggleMenu();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -54,6 +57,8 @@ protected:
 	void FireWeapon();
 	void StopFiring();
 	// void CircleMenu();
+	void NextWeapon();
+	void PrevWeapon();
 
 	// Weapon Functions
 	bool CheckOwnedWeapon(int InID);
@@ -64,10 +69,17 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		void TakeDamage(int Amount);
 
-	void RestoreHealth(bool bFromPickup);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+		void SetInvunrabilityTime(float Time, int Amount);
+
+	UFUNCTION(BlueprintCallable)
+		void RestoreHealth();
 
 	UFUNCTION(BlueprintCallable)
 		void AddMoney(int InAmount);
+
+	UFUNCTION(BlueprintCallable)
+		void AddAmmo();
 
 	UFUNCTION(BlueprintCallable)
 		void KillPlayer();
@@ -79,7 +91,7 @@ protected:
 	UFUNCTION()
 		void OnPickupEndOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 		void CollectPickup(AActor* InOtherActor);
 
 public:	
@@ -102,12 +114,15 @@ public:
 	// Variables
 	// References
 	APlayerController* PC;
-	class APlayerHUD* HUDRef;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class APlayerHUD* HUDRef;
+
 	class AMeleeWeapon* MeleeWeapon;
 	class ABaseWeapon* CurrentWeapon;
 
 	// States
-	bool bInMenu = false;
+	bool bInMenu = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		bool bInAir = false;
@@ -133,17 +148,20 @@ public:
 		TArray<FPlayerWeaponInventory> WeaponInventory;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
-		TArray<int> CircleWheel;
+		TArray<int> CircleWheel = {
+			{0},
+			{1},
+	};
 
 	// Health
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		int CurrentHealth;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-		int MaxHealth = 20;
+		bool bIsInvunrable;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-		int HealPerPickup = 20;
+		int MaxHealth = 20;
 
 	// Money
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Money")

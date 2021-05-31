@@ -5,6 +5,7 @@
 #include "GameFramework/HUD.h"
 
 #include "UObject/ConstructorHelpers.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 #include "PlayerHUD.generated.h"
 
@@ -25,6 +26,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void UpdateHUDElements(TArray<FString> InArgs);
 
+	UFUNCTION(BlueprintCallable)
+		void ShowChallengeMenu(bool bShow);
+
 	// Set the reference to the player
 	UFUNCTION()
 		void SetPlayerRef(APlayerCharacter* InRef);
@@ -36,11 +40,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 		TSubclassOf<UUserWidget> PlayerHUDWidgetComponent;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+		TSubclassOf<UUserWidget> PlayerMenuWidgetComponent;
+
 	// Widgets
 	class UPlayerHUDWidget* PlayerHUDWidget;
+	class UPlayerMenuWidget* PlayerMenuWidget;
 
 private:
 	// Classes
 	class APlayerCharacter* PlayerRef = nullptr;
-	//class ARoundCtrl* RoundRef = nullptr;
+	class ARoundCrtl* RoundRef = nullptr;
 };

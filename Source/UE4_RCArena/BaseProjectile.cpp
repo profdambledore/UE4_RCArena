@@ -40,18 +40,22 @@ void ABaseProjectile::Tick(float DeltaTime)
 
 }
 
-void ABaseProjectile::UpdateProjectileInfo(AActor* TrackingTarget)
+void ABaseProjectile::UpdateProjectileInfo(AActor* TrackingTarget, int InDamage)
 {
-	// Check if the projectile has a target to track
-	if (TrackingTarget != nullptr)
+	if (this != nullptr)
 	{
-		// Set it as a tracking projectile
-		ProjectileMovement->Velocity = FVector(0.0f, 0.0f, 0.0f);
-		ProjectileMovement->bIsHomingProjectile = true;
-		ProjectileMovement->HomingAccelerationMagnitude = ProjectileMovement->MaxSpeed;
+		Damage = InDamage;
+		// Check if the projectile has a target to track
+		if (TrackingTarget != nullptr)
+		{
+			// Set it as a tracking projectile
+			ProjectileMovement->Velocity = FVector(0.0f, 0.0f, 0.0f);
+			ProjectileMovement->bIsHomingProjectile = true;
+			ProjectileMovement->HomingAccelerationMagnitude = ProjectileMovement->MaxSpeed;
 
-		// Set what it is tracking
-		ProjectileMovement->HomingTargetComponent = TrackingTarget->GetRootComponent();
+			// Set what it is tracking
+			ProjectileMovement->HomingTargetComponent = TrackingTarget->GetRootComponent();
+		}
 	}
 }
 
@@ -70,13 +74,20 @@ void ABaseProjectile::OnProjBeginOverlap(UPrimitiveComponent* OverlappedComp, AA
 		}
 		// Cast to BaseBox, and call BreakBox()
 		FindCorrectTarget(OtherActor, true);
-		GetWorld()->DestroyActor(OtherActor, false, false); // Works.  For some reason, calling Destroy() in BaseBox->BreakBox() caused the program to crash - IsPendingKillPending, where 'this' was null.
-															// ERROR WAS FOUND - casting was always returning nullptr for some reason.  I dont know how to make it work
+		GetWorld()->DestroyActor(OtherActor, false, false);
 	}
-	//else if (OtherActor.GetClass()->IsChildOf(ABaseEnemy::StaticClass() == true)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Hit Enemy"));
-	//}
+	else if (OtherActor->GetClass()->IsChildOf(ABaseEnemy::StaticClass()) == true)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Hit Enemy"));
+		// Stop tracking the box, if currently
+		if (ProjectileMovement->bIsHomingProjectile == true)
+		{
+			ProjectileMovement->bIsHomingProjectile = false;
+			ProjectileMovement->HomingTargetComponent = nullptr;
+		}
+		// Cast to BaseBox, and call BreakBox()
+		FindCorrectTarget(OtherActor, false);
+	}
 
 	// Destroy the actor, whatever it hits
 	Destroy();

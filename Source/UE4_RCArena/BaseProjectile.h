@@ -27,7 +27,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to update the projectile.  Used to set if tracking a target and what target
-	void UpdateProjectileInfo(AActor* TrackingTarget);
+	void UpdateProjectileInfo(AActor* TrackingTarget, int InDamage);
 
 	// Overlap Functions
 	UFUNCTION()
@@ -53,4 +53,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		UProjectileMovementComponent* ProjectileMovement;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Damage")
+		int Damage;
 };
